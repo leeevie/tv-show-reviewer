@@ -2,7 +2,36 @@
 <%- include('../partials/menu') %>
 
 <div class="container">
-    
+    <h1 class="text-center">TV Show Reviews</h1>
+
+    <form action="/reviews/filter" method="GET">
+        <div class="row">
+            <div class="form-group col-sm-10">
+                <input type="text" class="form-control" name="filter" placeholder="Enter TV show title">
+            </div>
+            <div class="col-sm">
+                <input type="submit" value="Filter" class="btn btn-primary btn-block">
+            </div>
+        </div> 
+    </form>
+
+    <table class="table table-bordered">
+        <tr>
+            <th>TV Show</th>
+            <th>Review</th>
+            <th>Review Date</th>
+        </tr>
+
+        <% if (items) {
+            var rows = '';
+            items.forEach(function(item) {
+                rows += '<tr><td>' + item.tv_show + '</td><td>' + item.review + '</td><td>' + item.review_date + '</td></tr>';
+            }); %>
+            <%- rows %>
+        <% } %>
+
+    </table>
+
 </div>
 
 <%- include('../partials/footer') %>

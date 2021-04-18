@@ -1,8 +1,86 @@
 <%- include('../partials/header') %>
 <%- include('../partials/menu') %>
 
+<% if (show) { %>
+<br>
 <div class="container">
-    
+    <div class="row">
+        <div class="col-5 text-center">
+            <img src='<%- show.image.original %>' alt='<%- show.name %>' class="img-fluid">
+        </div>
+        <div class="col">
+            <table class="table">
+                <tr>
+                    <td colspan="2"><h2><%- show.name %></h2></td>
+                </tr>
+                <tr>
+                    <th class="text-center">Genres</th>
+                    <td><%- show.genres %></td>
+                </tr>
+                <tr>
+                    <th class="text-center">Summary</th>
+                    <td><%- show.summary %></td>
+                </tr>
+                <tr>
+                    <th class="text-center">Rating</th>
+                    <td><%- show.rating.average %></td>
+                </tr>
+                <tr>
+                    <td colspan="2">  
+                        <a href="#addReview" class="btn btn-primary" data-toggle="modal">Add Review</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
 </div>
+
+<!-- Lab 4: Modal HTML -->
+<div id="addReview" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h4 class="modal-title">Add Review</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <form action="/add-review" method="POST">
+                    <div class="form-group row">
+                        <label class="col-3 col-form-label">Show Name:</label>
+                        <div class="col">
+                            <input class="form-control" type="text" name="show_name" placeholder='<%- show.name %>' readonly value='<%- show.name %>'>
+                        </div>
+                    </div>
+    
+                    <div class="form-group row">
+                        <label class="col-3 col-form-label">Enter your review here:</label>
+                        <div class="col">
+                            <textarea class="form-control" rows="10" name="review"></textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col text-right">
+                            <button class="btn btn-primary" type="submit">Submit</button>
+                        </div>
+                        <div class="col-1"></div>
+                    </div>
+                </form>
+                
+            </div>
+        </div>
+    </div>
+</div>
+<% } else { %>
+    <br>
+    <div class="container text-center">
+        <h1>Search a TV Show!</h1>
+        <h1>Make Reviews!</h1>
+        <h1>Filter Your Reviews!</h1>
+        <h1>Click Buttons!</h1>
+        <p>Get started by searching in the top right.</p>
+    </div>
+<% } %>
 
 <%- include('../partials/footer') %>
