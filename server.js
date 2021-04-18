@@ -110,7 +110,6 @@ app.post('/add-review', function(req, res) {
 
     pool.query(insert, (err, results)=>{
         if(err){
-            throw err
             res.redirect('/home');
         }
         else {
