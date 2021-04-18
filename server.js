@@ -1,6 +1,4 @@
 // Lab 7:
-// require('dotenv').config()
-
 var express = require('express'); //Ensure our express framework has been added
 var app = express();
 var bodyParser = require('body-parser'); //Ensure our body-parser tool has been added
@@ -9,21 +7,16 @@ app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 // Lab 8: axios
 const axios = require('axios');
 
-const {pool} = require('./dbConfig'); //db connection
+require('dotenv').config();
+var pgp = require('pg-promise')();
 
+const isProduction = process.env.NODE_ENV ==='production';
+const connectionString = `postgresql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}`;
+const dbConfig = {
+    connectionString: isProduction ? process.env.DATABASE_URL : connectionString,
+};
 
-// // Create Database Connection
-// var pgp = require('pg-promise')();
-
-// const dbConfig = {
-// 	host: 'localhost',
-// 	port: 5432,
-// 	database: "postgres",
-// 	user: "postgres",
-// 	password: "lee"
-// };
-
-// let db = pgp(dbConfig);
+let db = pgp(dbConfig);
 
 app.set('view engine', 'ejs');
 app.use(express.static(__dirname + '/'));
@@ -101,78 +94,78 @@ app.post('/add-review', function(req, res) {
 
     var insert = `INSERT INTO reviews(tv_show, review, review_date) values (\'${show_name}\', \'${review}\', to_timestamp(${review_date} / 1000.0));`;
     
-	// db.any(insert)
-    // .then(function (rows) {
-    //     res.redirect('/reviews');
-    // })
-    // .catch(function (err) {
-    //     console.log(err);
-    //     res.redirect('/home');
-    // })
-
-    pool.query(insert, (err, results)=>{
-        if(err){
-            res.redirect('/home');
-        }
-        else {
-            res.redirect('/reviews');
-        } 
+	db.any(insert)
+    .then(function (rows) {
+        res.redirect('/reviews');
     })
+    .catch(function (err) {
+        console.log(err);
+        res.redirect('/home');
+    })
+
+    // pool.query(insert, (err, results)=>{
+    //     if(err){
+    //         res.redirect('/home');
+    //     }
+    //     else {
+    //         res.redirect('/reviews');
+    //     } 
+    // })
 })
 
 app.get('/reviews', function(req, res) {
     var select = 'SELECT * FROM reviews;';
 
-	// db.any(select)
-    // .then(function (rows) {
-    //     res.render('pages/reviews', {
-    //         page_title: "Reviews",
-    //         items: rows
-    //     })
-    // })
-    // .catch(function (err) {
-    //     console.log(err);
+	db.any(select)
+    .then(function (rows) {
+        res.render('pages/reviews', {
+            page_title: "Reviews",
+            items: rows
+        })
+    })
+    .catch(function (err) {
+        console.log(err);
         
-    // })
+    })
 
     
-    pool.query(select, (err, rows)=>{
-        if(rows){
-            // console.log(rows.rows);
-            res.render('pages/reviews', {
-                page_title: "Reviews",
-                items: rows.rows
-            })
-        }
-        else {
-            res.render('pages/reviews', {
-                page_title: "Reviews",
-                items: ''
-            })
-        } 
-    })
+    // pool.query(select, (err, rows)=>{
+    //     if(rows){
+    //         // console.log(rows.rows);
+    //         res.render('pages/reviews', {
+    //             page_title: "Reviews",
+    //             items: rows.rows
+    //         })
+    //     }
+    //     else {
+    //         res.render('pages/reviews', {
+    //             page_title: "Reviews",
+    //             items: ''
+    //         })
+    //     } 
+    // })
 });
 
 // for testing....
 app.get('/reviewsTest', function(req, res) {
     var select = 'SELECT * FROM reviews;';
 
-	// db.any(select)
-    // .then(function (rows) {
-    //     res.status(200).send(rows)
-    // })
-    // .catch(function (err) {
-    //     res.status(404).json({ err : error });
-    // })
-
-    pool.query(select, (err, rows)=>{
-        if(err){
-            res.status(404).json({ err : error });
-        }
-        else {
-            res.status(200).send(rows)
-        }
+	db.any(select)
+    .then(function (rows) {
+        res.status(200).send(rows)
     })
+    .catch(function (err) {
+        res.status(404).json({ err : error });
+    })
+
+    // pool.query(select, (err, rows)=>{
+    //     if(err){
+    //         res.status(404).json({ err : error });
+    //     }
+    //     else {
+    //         res.status(200).send(rows)
+    //     }
+    // })
     
 });
 
@@ -181,56 +174,56 @@ app.get('/reviews/filter', function(req, res) {
     var selectAll = 'SELECT * FROM reviews;';
     var selectFiltered = 'SELECT * FROM reviews WHERE tv_show=\'' + filter + '\';';
 
-	// db.task('get-everything', task => {
-    //     return task.batch([
-    //         task.any(selectAll),
-    //         task.any(selectFiltered)
-    //     ]);
-    // })
-    // .then(results => {
-    //     // if any reviews come up, then display them        
-    //     if (results[1].length > 0) {
-    //         res.render('pages/reviews', {
-    //             page_title: "Reviews",
-    //             items: results[1]
-    //         });
-    //     }
-    //     // otherwise, display all reviews
-    //     else {
-    //         res.render('pages/reviews', {
-    //             page_title: "Reviews",
-    //             items: results[0]
-    //         });
-    //     }	
-    // })
-    // .catch(err => {
-    //     console.log(err);
-    //     res.render('pages/reviews', {
-    //         page_title: "Reviews",
-    //         items: ''
-    //     });
-    // });
-
-    pool.query(selectFiltered, (err, rows)=>{
-        console.log(rows.rows);
+	db.task('get-everything', task => {
+        return task.batch([
+            task.any(selectAll),
+            task.any(selectFiltered)
+        ]);
+    })
+    .then(results => {
         // if any reviews come up, then display them        
-        if (rows.rows.length > 0) {
+        if (results[1].length > 0) {
             res.render('pages/reviews', {
                 page_title: "Reviews",
-                items: rows.rows
+                items: results[1]
             });
         }
+        // otherwise, display all reviews
         else {
-            // console.log("Couldn't find anything :(");
-            // res.redirect("/reviews");
-            pool.query(selectAll, (err, results) => {
-                res.render('pages/reviews', {
-                    page_title: "Reviews",
-                    items: results.rows
-                })
-            })
-        }
+            res.render('pages/reviews', {
+                page_title: "Reviews",
+                items: results[0]
+            });
+        }	
+    })
+    .catch(err => {
+        console.log(err);
+        res.render('pages/reviews', {
+            page_title: "Reviews",
+            items: ''
+        });
     });
+
+    // pool.query(selectFiltered, (err, rows)=>{
+    //     console.log(rows.rows);
+    //     // if any reviews come up, then display them        
+    //     if (rows.rows.length > 0) {
+    //         res.render('pages/reviews', {
+    //             page_title: "Reviews",
+    //             items: rows.rows
+    //         });
+    //     }
+    //     else {
+    //         // console.log("Couldn't find anything :(");
+    //         // res.redirect("/reviews");
+    //         pool.query(selectAll, (err, results) => {
+    //             res.render('pages/reviews', {
+    //                 page_title: "Reviews",
+    //                 items: results.rows
+    //             })
+    //         })
+    //     }
+    // });
 });
 
 // for mocha/chai testing
