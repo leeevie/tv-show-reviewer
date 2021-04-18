@@ -7,6 +7,7 @@
     "axios": "^0.21.1",
     "chai": "^4.3.4",
     "chai-http": "^4.3.0",
+    "dotenv": "^8.2.0",
     "ejs": "^3.1.6",
     "express": "^4.17.1",
     "mocha": "^8.3.2",
@@ -15,7 +16,7 @@
     "pg-promise": "^10.10.1"
   },
   "devDependencies": {},
-    "scripts": {
+  "scripts": {
     "test": "mocha --exit",
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",

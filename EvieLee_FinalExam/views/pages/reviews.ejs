@@ -24,9 +24,9 @@
 
         <% if (items) {
             var rows = '';
-            items.forEach(function(item) {
-                rows += '<tr><td>' + item.tv_show + '</td><td>' + item.review + '</td><td>' + item.review_date + '</td></tr>';
-            }); %>
+            for (var i = 0; i < items.length; i++) {
+                rows += '<tr><td>' + items[i].tv_show + '</td><td>' + items[i].review + '</td><td>' + items[i].review_date + '</td></tr>';
+            } %>
             <%- rows %>
         <% } %>
 
