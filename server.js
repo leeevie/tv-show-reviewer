@@ -26,6 +26,10 @@ const {pool} = require('./dbConfig'); //db connection
 app.set('view engine', 'ejs');
 app.use(express.static(__dirname + '/'));
 
+app.get('/', function(req, res) {
+    res.redirect("/home");
+});
+
 app.get('/home', function(req, res) {
     res.render("pages/main", {
         page_title: "Home",
