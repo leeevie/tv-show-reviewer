@@ -1,4 +1,6 @@
 // Lab 7:
+// require('dotenv').config()
+
 var express = require('express'); //Ensure our express framework has been added
 var app = express();
 var bodyParser = require('body-parser'); //Ensure our body-parser tool has been added
