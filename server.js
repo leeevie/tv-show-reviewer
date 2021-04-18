@@ -1,22 +1,31 @@
-// Lab 7:
+require('dotenv').config();
 var express = require('express'); //Ensure our express framework has been added
 var app = express();
 var bodyParser = require('body-parser'); //Ensure our body-parser tool has been added
 app.use(bodyParser.json());              // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
-// Lab 8: axios
 const axios = require('axios');
 
-require('dotenv').config();
+// Lab 10 database setup
 var pgp = require('pg-promise')();
 
-const isProduction = process.env.NODE_ENV ==='production';
-const connectionString = `postgresql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}`;
-const dbConfig = {
-    connectionString: isProduction ? process.env.DATABASE_URL : connectionString,
+const dev_dbConfig = {
+	host: process.env.DB_HOST,
+	port: process.env.DB_PORT,
+	database: process.env.DB_DATABASE,
+	user:  process.env.DB_USER,
+	password: process.env.DB_PASSWORD
 };
 
-let db = pgp(dbConfig);
+const isProduction = process.env.NODE_ENV === 'production';
+const dbConfig = isProduction ? process.env.DATABASE_URL : dev_dbConfig;
+
+if (isProduction) {
+  pgp.pg.defaults.ssl = {rejectUnauthorized: false};
+}
+const db = pgp(dbConfig);
+
+
 
 app.set('view engine', 'ejs');
 app.use(express.static(__dirname + '/'));
@@ -226,9 +235,8 @@ app.get('/reviews/filter', function(req, res) {
     // });
 });
 
-// for mocha/chai testing
-// module.exports = app.listen(3000);
-module.exports =
-app.listen(process.env.PORT||3000, function() {
-    console.log("Server started on port 3000" + __dirname);
+const server = app.listen(process.env.PORT || 3000, () => {
+    console.log(`Express running → PORT ${server.address().port}`);
 });
+// for mocha/chai testing
+module.exports = server;
