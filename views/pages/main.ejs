@@ -6,11 +6,11 @@
 <div class="container">
     <div class="row">
         <div class="col-5 text-center">
-            <!-- this API is a little spotty tbh so there are checks to see if some fields are undefined/null -->
+            <!-- error messages in case there's only one result and it's missing data -->
             <% if (show.image) { %>
                 <img src='<%- show.image.original %>' alt='<%- show.name %> poster' class="img-fluid">
             <% } else { %>
-                <p>No image provided!</p>
+                No image provided.
             <% } %>
         </div>
         <div class="col">
@@ -20,7 +20,7 @@
                         <% if (show.name) { %>
                             <%- show.name %>
                         <% } else { %>
-                            Error: no show name provided.
+                            No name provided.
                         <% } %>
                     </h2></td>
                 </tr>
@@ -79,7 +79,7 @@
                     <div class="form-group row">
                         <label class="col-3 col-form-label">Show Name:</label>
                         <div class="col">
-                            <input class="form-control" type="text" name="show_name" readonly value="<%- show.name %>">
+                            <input class="form-control" type="text" name="show_name" placeholder="<%- show.name %>" readonly value='<%- show.name %>'>
                         </div>
                     </div>
     

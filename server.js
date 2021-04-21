@@ -53,9 +53,56 @@ app.post('/search', function(req, res) {
             dataType: 'json'
         })
         .then(items => {
+            var show = '';
+
+            // find the first show with all the data needed
+            for (var i = 0; i < items.data.length; i++) {
+                var item = items.data[i].show;
+                var valid = 0;
+
+                // console.log(item.name);
+                if (item.name) {
+                    // console.log("valid name +1");
+                    valid += 1;
+                }
+                if (item.image) {
+                    if (item.image.original) {
+                        // console.log("valid image +1");
+                        valid += 1;
+                    }
+                }
+                if (item.genres) {
+                    // console.log("valid genres +1");
+                    valid += 1;
+                }
+                if (item.summary) {
+                    // console.log("valid summary +1");
+                    valid += 1;
+                }
+                if (item.rating) {
+                    if (item.rating.average) {
+                        // console.log("valid rating +1");
+                        valid += 1;
+                    }
+                }                
+
+                // console.log(valid);
+
+                if (valid == 5) {
+                    // console.log("Found one");
+                    show = item;
+                    break;
+                }
+            }
+
+            // if there isn't a result that has everything, just use the first one
+            if (show == '') {
+                show = items.data[0].show;
+            }
+            
             res.render('pages/main', {
                 page_title: "Home",
-                show: items.data[0].show,
+                show: show,
                 message: ''
             })
         })
