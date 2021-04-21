@@ -6,7 +6,12 @@
 <div class="container">
     <div class="row">
         <div class="col-5 text-center">
-            <img src='<%- show.image.original %>' alt='<%- show.name %>' class="img-fluid">
+            <!-- show.image was undefined once. just to take care of that: -->
+            <% if (show.image) { %>
+                <img src='<%- show.image.original %>' alt='<%- show.name %> poster' class="img-fluid">
+            <% } else { %>
+                <p>No image provided!</p>
+            <% } %>
         </div>
         <div class="col">
             <table class="table">
@@ -27,7 +32,7 @@
                 </tr>
                 <tr>
                     <td colspan="2">  
-                        <a href="#addReview" class="btn btn-primary" data-toggle="modal">Add Review</a>
+                        <a href="#addReview" class="btn btn-primary" data-toggle="modal" onclick="openModal()">Add Review</a>
                     </td>
                 </tr>
             </table>
@@ -50,19 +55,19 @@
                     <div class="form-group row">
                         <label class="col-3 col-form-label">Show Name:</label>
                         <div class="col">
-                            <input class="form-control" type="text" name="show_name" placeholder='<%- show.name %>' readonly value='<%- show.name %>'>
+                            <input class="form-control" type="text" name="show_name" readonly value="<%- show.name %>">
                         </div>
                     </div>
     
                     <div class="form-group row">
                         <label class="col-3 col-form-label">Enter your review here:</label>
                         <div class="col">
-                            <textarea class="form-control" rows="10" name="review"></textarea>
+                            <textarea class="form-control" rows="10" name="review" id="review"></textarea>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col text-right">
-                            <button class="btn btn-primary" type="submit">Submit</button>
+                            <button class="btn btn-primary" type="submit" id="submit_review" disabled>Submit</button>
                         </div>
                         <div class="col-1"></div>
                     </div>
@@ -72,6 +77,11 @@
         </div>
     </div>
 </div>
+<% } else if (message) { %>
+    <br>
+    <div class="container text-center">
+        <h2><%- message %></h2>
+    </div>
 <% } else { %>
     <br>
     <div class="container text-center">

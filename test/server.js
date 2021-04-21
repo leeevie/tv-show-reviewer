@@ -58,4 +58,17 @@ describe("Testing", () => {
         });
     });
 
+    it("Should get error for an invalid title search", done => {
+        chai
+        .request(server)
+        .post("/searchTest").send(
+            request = {
+            title : "$"
+        })
+        .end((err, res) => {
+            expect(res).to.have.status(404);
+            done();
+        });
+    });
+
   });

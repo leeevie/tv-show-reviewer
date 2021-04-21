@@ -37,7 +37,8 @@ app.get('/', function(req, res) {
 app.get('/home', function(req, res) {
     res.render("pages/main", {
         page_title: "Home",
-        show: ''
+        show: '',
+        message: ''
     });
 });
 
@@ -55,19 +56,22 @@ app.post('/search', function(req, res) {
             res.render('pages/main', {
                 page_title: "Home",
                 show: items.data[0].show,
+                message: ''
             })
         })
         .catch(error => {
             console.log(error);
             res.render('pages/main', {
                 page_title: "Home",
-                show: ''
+                show: '',
+                message: 'We couldn\'t find any shows with that title. Please try again!'
             })
         })
     } else {
         res.render('pages/main', {
             page_title: "Home",
-            show: ''
+            show: '',
+            message: 'We couldn\'t find any shows with that title. Please try again!'
         })
     }
 })
@@ -99,27 +103,24 @@ app.post('/searchTest', function(req, res) {
 app.post('/add-review', function(req, res) {
     var show_name = req.body.show_name;
     var review = req.body.review;
-    var review_date = Math.floor(Date.now() / 1000);
 
-    var insert = `INSERT INTO reviews(tv_show, review, review_date) values (\'${show_name}\', \'${review}\', to_timestamp(${review_date} / 1000.0));`;
-    
+    // dollar quotes to deal with apostrophes in show name and review
+    // wanna test it out? search "The King's Avatar" or just "avatar" and add a review
+    var insert = `INSERT INTO reviews(tv_show, review, review_date) values ($$${show_name}$$, $$${review}$$, current_timestamp);`;
+
 	db.any(insert)
     .then(function (rows) {
         res.redirect('/reviews');
     })
     .catch(function (err) {
         console.log(err);
-        res.redirect('/home');
+        res.render('pages/main', {
+            page_title: "Home",
+            show: '',
+            message: 'There was an error with adding your review. Please try again!'
+        })
     })
 
-    // pool.query(insert, (err, results)=>{
-    //     if(err){
-    //         res.redirect('/home');
-    //     }
-    //     else {
-    //         res.redirect('/reviews');
-    //     } 
-    // })
 })
 
 app.get('/reviews', function(req, res) {
@@ -129,30 +130,19 @@ app.get('/reviews', function(req, res) {
     .then(function (rows) {
         res.render('pages/reviews', {
             page_title: "Reviews",
-            items: rows
+            items: rows,
+            message: ''            
         })
     })
     .catch(function (err) {
         console.log(err);
-        
+        res.render('pages/reviews', {
+            page_title: "Reviews",
+            items: rows,
+            message: 'There was an error with loading the reviews page. Please try again!'            
+        })
     })
 
-    
-    // pool.query(select, (err, rows)=>{
-    //     if(rows){
-    //         // console.log(rows.rows);
-    //         res.render('pages/reviews', {
-    //             page_title: "Reviews",
-    //             items: rows.rows
-    //         })
-    //     }
-    //     else {
-    //         res.render('pages/reviews', {
-    //             page_title: "Reviews",
-    //             items: ''
-    //         })
-    //     } 
-    // })
 });
 
 // for testing....
@@ -164,75 +154,66 @@ app.get('/reviewsTest', function(req, res) {
         res.status(200).send(rows)
     })
     .catch(function (err) {
-        res.status(404).json({ err : error });
+        res.status(404).send(err);
     })
-
-    // pool.query(select, (err, rows)=>{
-    //     if(err){
-    //         res.status(404).json({ err : error });
-    //     }
-    //     else {
-    //         res.status(200).send(rows)
-    //     }
-    // })
     
 });
 
 app.get('/reviews/filter', function(req, res) {
     var filter = req.query.filter;
-    var selectAll = 'SELECT * FROM reviews;';
-    var selectFiltered = 'SELECT * FROM reviews WHERE tv_show=\'' + filter + '\';';
+
+    // queries:
+    // dollar quotes to handle ' and "
+    // matches title exactly (case insensitive)
+    var selectStrict = 'SELECT * FROM reviews WHERE tv_show ILIKE $$' + filter + '$$;'
+    // finds similar titles (regex)
+    var selectFiltered = 'SELECT * FROM reviews WHERE tv_show ILIKE $$%' + filter + '%$$;';
+    // gets all reviews
+    var selectAll = 'SELECT * FROM reviews;'; 
 
 	db.task('get-everything', task => {
         return task.batch([
-            task.any(selectAll),
-            task.any(selectFiltered)
+            task.any(selectStrict),
+            task.any(selectFiltered),
+            task.any(selectAll)
         ]);
     })
     .then(results => {
+        var display = '';
+        var msg = '';
+
         // if any reviews come up, then display them        
-        if (results[1].length > 0) {
-            res.render('pages/reviews', {
-                page_title: "Reviews",
-                items: results[1]
-            });
+        if (results[0].length > 0) {
+            display = results[0];
+            msg = 'Here are your reviews!';
+        }
+        // if nothing, search similar titles
+        else if (results[1].length > 0) {
+            display = results[1];
+            msg = "We couldn't find an exact match. Here are some similar titles.";
         }
         // otherwise, display all reviews
         else {
-            res.render('pages/reviews', {
-                page_title: "Reviews",
-                items: results[0]
-            });
-        }	
+            display = results[2];
+            msg = "We couldn't find any results. Displaying all reviews.";
+        }
+
+        res.render('pages/reviews', {
+            page_title: "Reviews",
+            items: display,
+            message: msg
+        });
+
     })
     .catch(err => {
         console.log(err);
         res.render('pages/reviews', {
             page_title: "Reviews",
-            items: ''
+            items: results[0],
+            message: "There was an error with filtering the reviews page. Please try again!"
         });
     });
 
-    // pool.query(selectFiltered, (err, rows)=>{
-    //     console.log(rows.rows);
-    //     // if any reviews come up, then display them        
-    //     if (rows.rows.length > 0) {
-    //         res.render('pages/reviews', {
-    //             page_title: "Reviews",
-    //             items: rows.rows
-    //         });
-    //     }
-    //     else {
-    //         // console.log("Couldn't find anything :(");
-    //         // res.redirect("/reviews");
-    //         pool.query(selectAll, (err, results) => {
-    //             res.render('pages/reviews', {
-    //                 page_title: "Reviews",
-    //                 items: results.rows
-    //             })
-    //         })
-    //     }
-    // });
 });
 
 const server = app.listen(process.env.PORT || 3000, () => {

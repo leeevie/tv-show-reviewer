@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS reviews (
     id SERIAL PRIMARY KEY,
-    tv_show VARCHAR NOT NULL,
-    review VARCHAR NOT NULL,
+    tv_show VARCHAR(50) NOT NULL,
+    review VARCHAR(500) NOT NULL,
     review_date TIMESTAMP NOT NULL
 );

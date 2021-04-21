@@ -7,13 +7,19 @@
     <form action="/reviews/filter" method="GET">
         <div class="row">
             <div class="form-group col-sm-10">
-                <input type="text" class="form-control" name="filter" placeholder="Enter TV show title">
+                <input type="text" class="form-control" name="filter" id="filter" placeholder="Enter TV show title">
             </div>
             <div class="col-sm">
-                <input type="submit" value="Filter" class="btn btn-primary btn-block">
+                <input type="submit" value="Filter" id="filter_button" class="btn btn-primary btn-block" disabled>
             </div>
         </div> 
     </form>
+
+    <% if (message) { %>
+        <div class="container text-center">
+            <h3><%- message %></h3>
+        </div>
+    <% } %>
 
     <table class="table table-bordered">
         <tr>
