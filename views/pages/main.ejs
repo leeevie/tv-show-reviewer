@@ -6,7 +6,7 @@
 <div class="container">
     <div class="row">
         <div class="col-5 text-center">
-            <!-- show.image was undefined once. just to take care of that: -->
+            <!-- this API is a little spotty tbh so there are checks to see if some fields are undefined/null -->
             <% if (show.image) { %>
                 <img src='<%- show.image.original %>' alt='<%- show.name %> poster' class="img-fluid">
             <% } else { %>
@@ -16,19 +16,43 @@
         <div class="col">
             <table class="table">
                 <tr>
-                    <td colspan="2"><h2><%- show.name %></h2></td>
+                    <td colspan="2"><h2>
+                        <% if (show.name) { %>
+                            <%- show.name %>
+                        <% } else { %>
+                            Error: no show name provided.
+                        <% } %>
+                    </h2></td>
                 </tr>
                 <tr>
                     <th class="text-center">Genres</th>
-                    <td><%- show.genres %></td>
+                    <td>
+                        <% if (show.genres.length > 0) { %>
+                            <%- show.genres %>
+                        <% } else { %>
+                            No genres provided.
+                        <% } %>
+                    </td>
                 </tr>
                 <tr>
                     <th class="text-center">Summary</th>
-                    <td><%- show.summary %></td>
+                    <td>
+                        <% if (show.summary) { %>
+                            <%- show.summary %>
+                        <% } else { %>
+                            No summary provided.
+                        <% } %>
+                    </td>
                 </tr>
                 <tr>
                     <th class="text-center">Rating</th>
-                    <td><%- show.rating.average %></td>
+                    <td>
+                        <% if (show.rating.average) { %>
+                            <%- show.rating.average %>
+                        <% } else { %>
+                            No rating provided.
+                        <% } %>
+                    </td>
                 </tr>
                 <tr>
                     <td colspan="2">  
