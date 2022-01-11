@@ -1,6 +1,6 @@
 # tv-show-reviewer
 
-TV Show Reviewer
+TV Show Reviewer using TV M
 
 ## How to run locally
 
