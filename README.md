@@ -1,6 +1,6 @@
 # tv-show-reviewer
 
-TV Show Reviewer using TV M
+TV Show Reviewer using TVmaze REST API.
 
 ## How to run locally
 
